@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>Data Fetch</title>
+        <style>
+            button {
+                text-align: center;
+                background-color: aqua;
+                color:#fff;
+                padding: 20px;
+                border:0;
+                margin-bottom: 20px;
+            }
+            .banner {min-height: 400px;width: 100%;background-color: #000;opacity: 0.9;position: relative;}
+            .elem {
+                position: absolute;bottom: 30px;left:0;right:0;
+            }
+            #map-canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      select {
+          height: 30px;
+          line-height: 30px;
+          border-radius: 5px;
+      }
+        </style>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+            <script>
+                var NewR;
+               
+                $(document).ready(function(){
+
+               
+            $('button').on('click', function(){
+                $('#app').append('<select><option></option></select');
+                    $('button').attr("disabled", true);
+               $.ajax({
+                type: 'GET',
+                url: 'https://api.meetup.com/2/cities',
+                success: function(data){
+               //     var NewR = JSON.stringify(data);
+               console.log(data.results[1].zip);
+               
+              var k = data.results.length;
+             
+
+              for (i=1; i < k; i++) {
+                   var cityName =(data.results[i].city);
+                    var lat =(data.results[i].lat);
+                    var long =(data.results[i].lon);
+                    $('#app select').append('<option value='+lat+','+long+'>'+cityName+'</option>')
+              }
+             
+               
+                },
+                dataType: 'jsonp',
+
+               });
+               selectOpt();
+               
+            });
+        });
+        function selectOpt() {
+            $('select').on('change', function() {
+                var optionSelected = $("option:selected", this);
+                var valueSelected = this.value;
+          
+           //    console.log(lat+'--------'+long);
+           valueSelected = valueSelected.split(',');
+           console.log(valueSelected[1]);
+               var lat =  valueSelected[0];
+             var long =  valueSelected[1];
+              initialize(lat,long);
+            
+            });
+        }
+        function initialize(lat,long) {
+            console.log(lat+'--------'+long);
+    var myLatlng = new google.maps.LatLng(lat, long);
+    var mapOptions = {
+        zoom: 12,
+        center: myLatlng,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+     //=====Initialise Default Marker    
+    var marker = new google.maps.Marker({
+        position: myLatlng,
+        map: map,
+        title: 'marker'
+     //=====You can even customize the icons here
+    });
+
+  
+
+
+}
+
+            </script>
+    </head>
+    <body style="margin: 0px auto;">
+        <div class="banner">
+                <div id="map-canvas"></div>
+                <div class="elem">
+                        <div style="text-align: center"><button>Get Data</button></div>
+                         <div id="app" style="text-align: center"></div>
+                         </div>
+
+        </div>
+        
+    </body>
+
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+   
+</html>
